@@ -1,16 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ApplicantProfile } from './applicant-profiles.entity';
 
 @Injectable()
 export class ApplicantProfilesService {
-  private profiles = [];
+  constructor(
+    @InjectRepository(ApplicantProfile)
+    private applicantProfilesRepository: Repository<ApplicantProfile>,
+  ) {}
 
-  createProfile(profileData) {
-    const newProfile = { id: Date.now(), ...profileData };
-    this.profiles.push(newProfile);
-    return newProfile;
+  createProfile(profileData: ApplicantProfile): Promise<ApplicantProfile> {
+    const newProfile = this.applicantProfilesRepository.create(profileData)
+    return this.applicantProfilesRepository.save(newProfile)
   }
 
   getProfiles() {
-    return this.profiles;
+    return this.applicantProfilesRepository.find()
   }
 }
