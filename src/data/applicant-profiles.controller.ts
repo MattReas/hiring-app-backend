@@ -4,11 +4,13 @@ import { ApplicantProfile } from './applicant-profiles.entity';
 
 @Controller('applicantProfiles')
 export class ApplicantProfilesController {
-  constructor(private readonly applicantProfilesService: ApplicantProfilesService) {}
+  constructor(
+    private readonly applicantProfilesService: ApplicantProfilesService,
+  ) {}
 
   @Post()
   createProfile(@Body() profileData: ApplicantProfile) {
-    return this.applicantProfilesService.createProfile(profileData)
+    return this.applicantProfilesService.createProfile(profileData);
   }
 
   @Get()
