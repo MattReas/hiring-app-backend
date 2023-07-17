@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { InterviewAnswer } from './interview-answer/interview-answer.entity'
 
 @Entity('applicantProfiles')
 export class ApplicantProfile {
@@ -19,4 +20,7 @@ export class ApplicantProfile {
 
     @Column()
     position: string
+
+    @OneToMany(() => InterviewAnswer, answer => answer.applicant)
+    answer: InterviewAnswer[];
 }
