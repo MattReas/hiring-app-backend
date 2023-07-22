@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ApplicantProfilesModule } from './data/applicant-profiles.module';
-import { InterviewAnswersModule } from './data/interview-answers/interview-answers.module';
-import { InterviewTemplatesModule } from './data/interview-templates/interview-templates.module';
-import { InterviewQuestionsModule } from './data/interview-questions/interview-questions.module';
+import { InterviewAnswerModule } from './data/interview-answer/interview-answer.module';
+import { InterviewTemplateModule } from './data/template/interview-template.module';
+import { InterviewQuestionModule } from './data/interview-question/interview-question.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -20,9 +20,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true,
     }),
     ApplicantProfilesModule,
-    InterviewAnswersModule,
-    InterviewTemplatesModule,
-    InterviewQuestionsModule,
+    InterviewAnswerModule,
+    InterviewTemplateModule,
+    InterviewQuestionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
