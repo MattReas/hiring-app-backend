@@ -5,11 +5,21 @@ import { InterviewTemplate } from './interview-template.entity';
 @Controller('interview-template')
 export class InterviewTemplateController {
     constructor(private readonly interviewTemplateService: InterviewTemplateService) {}
-
     @Get()
-    findAll(): Promise<InterviewTemplate[]> {
-        return this.interviewTemplateService.findAll()
+    async findAll(): Promise<InterviewTemplate[]> {
+        try {
+            const templates = await this.interviewTemplateService.findAll();
+            console.log(templates);
+            return templates;
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.NOT_FOUND)
+        }
     }
+    // @Get()
+    // findAll(): Promise<InterviewTemplate[]> {
+    //     console.log(this.interviewTemplateService.findAll())
+    //     return this.interviewTemplateService.findAll()
+    // }
 
     @Get(':id')
     async findOne(@Param('id') id:number): Promise<InterviewTemplate> {
