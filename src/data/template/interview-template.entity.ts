@@ -6,6 +6,9 @@ export class InterviewTemplate {
     @PrimaryGeneratedColumn()
     id: number
 
+    @Column()
+    templateName: string
+
     @OneToMany(() => InterviewQuestion, question => question.template)
     questions: InterviewQuestion[]
 }
