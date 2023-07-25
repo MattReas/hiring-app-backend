@@ -7,6 +7,9 @@ export class InterviewQuestion {
     @PrimaryGeneratedColumn()
     id: number
 
+    @Column()
+    question: string
+
     @ManyToOne(() => InterviewTemplate, template => template.questions)
     template: InterviewTemplate
 

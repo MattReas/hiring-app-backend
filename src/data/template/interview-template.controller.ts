@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Post, Body, Put, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { InterviewTemplateService } from './interview-template.service';
 import { InterviewTemplate } from './interview-template.entity';
+import { InterviewQuestion } from '../interview-question/interview-question.entity'
 
 @Controller('interview-template')
 export class InterviewTemplateController {
@@ -9,7 +10,7 @@ export class InterviewTemplateController {
     async findAll(): Promise<InterviewTemplate[]> {
         try {
             const templates = await this.interviewTemplateService.findAll();
-            console.log(templates);
+            // console.log(templates);
             return templates;
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.NOT_FOUND)
@@ -30,8 +31,20 @@ export class InterviewTemplateController {
         }
     }
 
+    @Get(':id/questions')
+    async findTemplateQuestions(@Param('id') id: number): Promise<InterviewQuestion[]> {
+        try {
+            const templates = await this.interviewTemplateService.findTemplateQuestions(id)
+            console.log(templates)
+            return templates
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.NOT_FOUND)
+        }
+    }
+
     @Post()
     create(@Body() template: Partial<InterviewTemplate>): Promise<InterviewTemplate> {
+        console.log(template)
         return this.interviewTemplateService.create(template)
     }
 
