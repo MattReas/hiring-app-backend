@@ -35,7 +35,6 @@ export class InterviewTemplateController {
     async findTemplateQuestions(@Param('id') id: number): Promise<InterviewQuestion[]> {
         try {
             const templates = await this.interviewTemplateService.findTemplateQuestions(id)
-            console.log(templates)
             return templates
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.NOT_FOUND)
@@ -44,13 +43,13 @@ export class InterviewTemplateController {
 
     @Post()
     create(@Body() template: Partial<InterviewTemplate>): Promise<InterviewTemplate> {
-        console.log(template)
         return this.interviewTemplateService.create(template)
     }
 
     @Put(':id')
     async update(@Param('id') id: number, @Body() template: Partial<InterviewTemplate>): Promise<InterviewTemplate> {
         try {
+            console.log(id)
             return await this.interviewTemplateService.update(id, template)
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.NOT_FOUND)
