@@ -29,7 +29,6 @@ export class InterviewTemplateService {
     }
 
     async findTemplateQuestions(id: number): Promise<InterviewQuestion[]> {
-        console.log(id)
         const template = (await this.interviewTemplateRepository.find({            
             where: { id },
             relations: ["questions"]
