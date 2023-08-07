@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApplicantProfile } from './applicant-profiles.entity';
@@ -17,5 +17,14 @@ export class ApplicantProfilesService {
 
   getProfiles() {
     return this.applicantProfilesRepository.find()
+  }
+
+  async findOne(id: number): Promise<ApplicantProfile> {
+    try {
+      const applicant = await this.applicantProfilesRepository.findOneByOrFail({ id: id })
+      return applicant
+    } catch (error) {
+      throw new NotFoundException(`Applicant profile with ID ${id} not found`)
+    }
   }
 }

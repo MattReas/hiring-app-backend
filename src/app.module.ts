@@ -5,6 +5,7 @@ import { ApplicantProfilesModule } from './data/applicant-profiles.module';
 import { InterviewAnswerModule } from './data/interview-answer/interview-answer.module';
 import { InterviewTemplateModule } from './data/template/interview-template.module';
 import { InterviewQuestionModule } from './data/interview-question/interview-question.module';
+import { PositionModule } from './data/Position/position.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -23,6 +24,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     InterviewAnswerModule,
     InterviewTemplateModule,
     InterviewQuestionModule,
+    PositionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
