@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm'
 import { InterviewAnswer } from './interview-answer/interview-answer.entity'
+import { Position } from './Position/position.entity'
 
 @Entity('applicantProfiles')
 export class ApplicantProfile {
@@ -18,8 +19,9 @@ export class ApplicantProfile {
     @Column()
     grad: string
 
-    @Column()
-    position: string
+    @ManyToMany(() => Position, position => position.applicants)
+    @JoinTable()
+    position: Position[]
 
     @OneToMany(() => InterviewAnswer, answer => answer.applicant)
     answer: InterviewAnswer[];

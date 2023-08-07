@@ -86,10 +86,6 @@ export class InterviewTemplateService {
                 question.template = template
                 const newQuestion = this.interviewQuestionRepository.create(question)
                 await this.manager.save(newQuestion)
-                // const newQuestion = new InterviewQuestion();
-                // newQuestion.question = questionData.question;
-                // newQuestion.template = template; // Set relation
-                // template.questions.push(newQuestion);
             }
         }
     
