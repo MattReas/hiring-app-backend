@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InterviewTemplate } from './interview-template.entity';
 import { InterviewQuestion } from '../interview-question/interview-question.entity'
+import { InterviewQuestionService } from '../interview-question/interview-question.service';
 import { EntityManager } from 'typeorm';
 
 @Injectable()
@@ -12,6 +13,7 @@ export class InterviewTemplateService {
         private interviewTemplateRepository: Repository<InterviewTemplate>,
         @InjectRepository(InterviewQuestion)
         private interviewQuestionRepository: Repository<InterviewQuestion>,
+        private readonly interviewQuestionService: InterviewQuestionService,
         private manager: EntityManager
     ) {}
 
@@ -78,13 +80,16 @@ export class InterviewTemplateService {
             let question = template.questions.find(q => q.id === questionData.id);
             if (question) {
                 // Update existing question
-                question.question = questionData.question;
+                await this.interviewQuestionService.update(question.id, { question: questionData.question})
             } else {
                 // Add new question
-                const newQuestion = new InterviewQuestion();
-                newQuestion.question = questionData.question;
-                newQuestion.template = template; // Set relation
-                template.questions.push(newQuestion);
+                question.template = template
+                const newQuestion = this.interviewQuestionRepository.create(question)
+                await this.manager.save(newQuestion)
+                // const newQuestion = new InterviewQuestion();
+                // newQuestion.question = questionData.question;
+                // newQuestion.template = template; // Set relation
+                // template.questions.push(newQuestion);
             }
         }
     
