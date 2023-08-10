@@ -17,7 +17,8 @@ import { PositionController } from './position.controller';
         ])
     ],
     providers: [PositionService],
-    controllers: [PositionController]
+    controllers: [PositionController],
+    exports: [PositionService]
 })
 
 export class PositionModule {}

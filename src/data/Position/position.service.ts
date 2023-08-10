@@ -57,47 +57,77 @@ export class PositionService {
     }
 
     async addApplicant(positionId: number, applicantId:number): Promise<Position> {
-        const position = await this.positionRepository.findOne({where: { id: positionId },  relations: ['applicants']})
-        const applicant = await this.applicantRepository.findOne({where: {id: applicantId}})
-
-        if (!position || !applicant) {
+        const position = await this.positionRepository.findOne({where: { id: positionId }, relations: ['applicants']});
+        const applicant = await this.applicantRepository.findOne({where: {id: applicantId}, relations: ['positions']});
+        
+         if (!position || !applicant) {
             throw new NotFoundException('Position or Applicant not found')
         }
 
         position.applicants.push(applicant)
-        return this.positionRepository.save(position)
+        applicant.positions.push(position)
+        await this.positionRepository.save(position)
+        await this.applicantRepository.save(applicant)
+
+        position.applicants = position.applicants.map(applicant => {
+            const { positions, ...rest } = applicant;
+            return { ...rest, positions: [] };
+        });
+
+        return position
     }
 
     async removeApplicant(positionId: number, applicantId: number): Promise<Position> {
-        const position = await this.positionRepository.findOne({where: { id: positionId },  relations: ['applicants']})
+        const position = await this.positionRepository.findOne({where: { id: positionId }, relations: ['applicants']});
+        const applicant = await this.applicantRepository.findOne({where: {id: applicantId}, relations: ['positions']});
         
-        if (!position) {
-            throw new NotFoundException('Position not found')
+        if (!position || !applicant) {
+            throw new NotFoundException('Position or Applicant not found')
         }
+        console.log(typeof applicantId)
+        console.log(position.applicants)
+        position.applicants = position.applicants.filter(app => app.id !== +applicantId)
+        console.log(position)
+        
+        applicant.positions = applicant.positions.filter(pos => pos.id !== +positionId)
 
-        position.applicants = position.applicants.filter(applicant => applicant.id !== applicantId)
-        return this.positionRepository.save(position)
+        await this.positionRepository.save(position)
+        await this.applicantRepository.save(applicant)
+
+        return position
     }
 
     async assignTemplate(positionId: number, templateId: number): Promise<Position> {
         const position = await this.positionRepository.findOne({where: { id: positionId },  relations: ['applicants']})
-        const template = await this.templateRepository.findOne({where: {id: templateId}})
+        const template = await this.templateRepository.findOne({where: {id: templateId}, relations: ['positions']});
 
         if (!position || !template){
             throw new NotFoundException('Position or template not found')
         }
 
         position.templates.push(template)
-        return this.positionRepository.save(position)
+        template.positions.push(position)
+        
+        await this.positionRepository.save(position)
+        await this.templateRepository.save(template)
+
+        return position
     }
 
     async unassignTemplate(positionId: number, templateId: number): Promise<Position> {
         const position = await this.positionRepository.findOne({where: { id: positionId },  relations: ['applicants']})
-        if (!position) {
-            throw new NotFoundException('Position not found')
+        const template = await this.templateRepository.findOne({where: {id: templateId}, relations: ['positions']});
+        
+        if (!position || !template) {
+            throw new NotFoundException('Position or Template not found')
         }
         
-        position.templates = position.templates.filter(template => template.id !== templateId)
-        return this.positionRepository.save(position)
+        position.templates = position.templates.filter(template => template.id !== +templateId)
+        template.positions = template.positions.filter(pos => pos.id !== +positionId)
+
+        await this.templateRepository.save(template)
+        await this.positionRepository.save(position)
+        
+        return position
     }
 }

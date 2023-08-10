@@ -19,9 +19,12 @@ export class ApplicantProfile {
     @Column()
     grad: string
 
+    // needed for the createProfile to temporarily hold the position name
+    @Column({ type: 'text' })
+    position: string
+
     @ManyToMany(() => Position, position => position.applicants)
-    @JoinTable()
-    position: Position[]
+    positions: Position[]
 
     @OneToMany(() => InterviewAnswer, answer => answer.applicant)
     answer: InterviewAnswer[];

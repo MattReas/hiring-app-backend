@@ -14,5 +14,5 @@ export class InterviewTemplate {
     questions: InterviewQuestion[]
 
     @ManyToMany(() => Position, position => position.templates)
-    position: Position[]
+    positions: Position[]
 }

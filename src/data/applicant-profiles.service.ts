@@ -2,17 +2,30 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApplicantProfile } from './applicant-profiles.entity';
+import { PositionService } from './Position/position.service';
 
 @Injectable()
 export class ApplicantProfilesService {
   constructor(
     @InjectRepository(ApplicantProfile)
     private applicantProfilesRepository: Repository<ApplicantProfile>,
+    private readonly positionService: PositionService
   ) {}
 
-  createProfile(profileData: ApplicantProfile): Promise<ApplicantProfile> {
+  async createProfile(profileData: ApplicantProfile): Promise<ApplicantProfile> {
     const newProfile = this.applicantProfilesRepository.create(profileData)
-    return this.applicantProfilesRepository.save(newProfile)
+    const savedProfile = await this.applicantProfilesRepository.save(newProfile)
+
+    const positions = await this.positionService.findAll()
+    const targetPosition = positions.find(position => position.positionTitle === profileData.position)
+
+    if (targetPosition) {
+      await this.positionService.addApplicant(targetPosition.id, savedProfile.id)
+    } else {
+      console.warn(`Position with title ${profileData.position} was not found.`)
+    }
+
+    return savedProfile
   }
 
   getProfiles() {
