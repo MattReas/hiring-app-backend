@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Not, Repository, In } from 'typeorm';
 import { Position } from '../position/position.entity';
 import { ApplicantProfile } from '../applicant-profiles.entity';
 import { InterviewTemplate } from '../template/interview-template.entity';
@@ -129,5 +129,26 @@ export class PositionService {
         await this.positionRepository.save(position)
         
         return position
+    }
+
+    async assignTemplatesByTitles(positionTitles: string[], templateId: number): Promise<Position[]> {
+        console.log(positionTitles)
+        const positions = await this.positionRepository.find({ where: { positionTitle: In(positionTitles) }, relations: ['applicants']})
+        const template = await this.templateRepository.findOne({where: { id: templateId }, relations: ['positions']})
+
+        if (positions.length === 0 || !template) {
+            throw new NotFoundException('Position(s) or template not found')
+        }
+
+        for (let position of positions) {
+            position.templates.push(template)
+            template.positions.push(position)
+        }
+
+        await this.positionRepository.save(positions)
+        await this.templateRepository.save(template)
+
+        return positions
+    
     }
 }

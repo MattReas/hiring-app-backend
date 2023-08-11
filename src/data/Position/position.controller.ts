@@ -58,4 +58,13 @@ export class PositionController {
     unassignTemplate(@Param('positionId') positionId: number, @Param('templateId') templateId: number): Promise<Position> {
         return this.positionService.unassignTemplate(positionId, templateId);
     }
+    
+    @Post('assign-templates')
+    async assignTemplatesByTitles
+    (@Body('templateId') templateId: number, 
+    @Body('positionTitles') positionTitles: string[]
+    ): Promise<Position[]> {
+        console.log(positionTitles)
+        return this.positionService.assignTemplatesByTitles(positionTitles, templateId)
+    }
 }
