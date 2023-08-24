@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Not, Repository, In } from 'typeorm';
 import { Position } from '../position/position.entity';
 import { ApplicantProfile } from '../applicant-profiles.entity';
 import { InterviewTemplate } from '../template/interview-template.entity';
@@ -33,7 +33,6 @@ export class PositionService {
     async create(data: Partial<Position>): Promise<Position> {
         const position = this.positionRepository.create({
             ...data,
-            applicants: [],
             templates: []
         })
         return this.positionRepository.save(position)
@@ -56,47 +55,6 @@ export class PositionService {
         }
     }
 
-    async addApplicant(positionId: number, applicantId:number): Promise<Position> {
-        const position = await this.positionRepository.findOne({where: { id: positionId }, relations: ['applicants']});
-        const applicant = await this.applicantRepository.findOne({where: {id: applicantId}, relations: ['positions']});
-        
-         if (!position || !applicant) {
-            throw new NotFoundException('Position or Applicant not found')
-        }
-
-        position.applicants.push(applicant)
-        applicant.positions.push(position)
-        await this.positionRepository.save(position)
-        await this.applicantRepository.save(applicant)
-
-        position.applicants = position.applicants.map(applicant => {
-            const { positions, ...rest } = applicant;
-            return { ...rest, positions: [] };
-        });
-
-        return position
-    }
-
-    async removeApplicant(positionId: number, applicantId: number): Promise<Position> {
-        const position = await this.positionRepository.findOne({where: { id: positionId }, relations: ['applicants']});
-        const applicant = await this.applicantRepository.findOne({where: {id: applicantId}, relations: ['positions']});
-        
-        if (!position || !applicant) {
-            throw new NotFoundException('Position or Applicant not found')
-        }
-        console.log(typeof applicantId)
-        console.log(position.applicants)
-        position.applicants = position.applicants.filter(app => app.id !== +applicantId)
-        console.log(position)
-        
-        applicant.positions = applicant.positions.filter(pos => pos.id !== +positionId)
-
-        await this.positionRepository.save(position)
-        await this.applicantRepository.save(applicant)
-
-        return position
-    }
-
     async assignTemplate(positionId: number, templateId: number): Promise<Position> {
         const position = await this.positionRepository.findOne({where: { id: positionId },  relations: ['applicants']})
         const template = await this.templateRepository.findOne({where: {id: templateId}, relations: ['positions']});
@@ -106,10 +64,8 @@ export class PositionService {
         }
 
         position.templates.push(template)
-        template.positions.push(position)
         
         await this.positionRepository.save(position)
-        await this.templateRepository.save(template)
 
         return position
     }
@@ -123,11 +79,30 @@ export class PositionService {
         }
         
         position.templates = position.templates.filter(template => template.id !== +templateId)
-        template.positions = template.positions.filter(pos => pos.id !== +positionId)
-
-        await this.templateRepository.save(template)
+        
         await this.positionRepository.save(position)
         
         return position
+    }
+
+    async assignTemplatesByTitles(positionTitles: string[], templateId: number): Promise<Position[]> {
+        console.log(positionTitles)
+        const positions = await this.positionRepository.find({ where: { positionTitle: In(positionTitles) }, relations: ['applicants']})
+        const template = await this.templateRepository.findOne({where: { id: templateId }, relations: ['positions']})
+
+        if (positions.length === 0 || !template) {
+            throw new NotFoundException('Position(s) or template not found')
+        }
+
+        for (let position of positions) {
+            position.templates.push(template)
+            
+        }
+
+        await this.positionRepository.save(positions)
+        await this.templateRepository.save(template)
+
+        return positions
+    
     }
 }
