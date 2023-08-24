@@ -13,6 +13,4 @@ export class InterviewTemplate {
     @OneToMany(() => InterviewQuestion, question => question.template)
     questions: InterviewQuestion[]
 
-    @ManyToMany(() => Position, position => position.templates)
-    positions: Position[]
 }

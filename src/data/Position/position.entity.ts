@@ -9,10 +9,6 @@ export class Position {
 
     @Column()
     positionTitle: string
-    
-    @ManyToMany(() => ApplicantProfile, applicant => applicant.positions, { eager: true, cascade: false })
-    @JoinTable()
-    applicants: ApplicantProfile[]
 
     @ManyToMany(() => InterviewTemplate, template => template.positions, { eager: true, cascade: false })
     @JoinTable()
